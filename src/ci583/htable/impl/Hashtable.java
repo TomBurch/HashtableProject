@@ -43,11 +43,15 @@ public class Hashtable<V> {
 		long t1 = System.nanoTime();
 		int nPrimes = 0;
 		
-		for (int i = 1; i <= 1000000; i++) {
-			if (isPrime(i)) {
-				//System.out.println(i);
-				nPrimes++;
-			}
+		//for (int i = 1; i <= 1000000; i++) {
+		//	if (isPrime(i)) {
+		//		//System.out.println(i);
+		//		nPrimes++;
+		//	}
+		//}
+		
+		for (int i = 1; i <= 100; i++) {
+			System.out.println(nextPrime(i));
 		}
 		
 		long t2 = System.nanoTime();
@@ -246,7 +250,22 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	private int nextPrime(int n) {
-		throw new UnsupportedOperationException("Method not implemented");
+		int i;
+		//Set i to closest odd number
+		if (n % 2 == 0) {
+			i = n + 1;
+		} else {
+			i = n;
+		}
+		
+		//Check every odd number between n and 2*n
+		for (; i < 2 * n; i += 2) {
+			if (isPrime(i)) {
+				break;
+			}
+		}
+		
+		return i;
 	}
 
 	/**
