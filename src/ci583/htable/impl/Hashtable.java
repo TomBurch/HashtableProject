@@ -40,6 +40,8 @@ public class Hashtable<V> {
 	 * @param initialCapacity
 	 */
 	public Hashtable(int initialCapacity) {
+		max = nextPrime(initialCapacity);
+		
 		long t1 = System.nanoTime();
 		int nPrimes = 0;
 		
