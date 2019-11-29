@@ -222,7 +222,7 @@ public class Hashtable<V> {
 				return false; //Definitely not a prime
 			}			
 		}
-		return true; //Possibly a prime
+		return true; //Possibly a prime.
 		
 		
 		//if (n <= 3) {
