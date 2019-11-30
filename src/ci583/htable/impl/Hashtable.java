@@ -40,7 +40,10 @@ public class Hashtable<V> {
 	 * @param initialCapacity
 	 */
 	public Hashtable(int initialCapacity) {
-		max = nextPrime(initialCapacity);
+		//Set max size so that max * maxLoad = initialCapacity
+		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));
+		
+		System.out.println(max);
 		
 		long t1 = System.nanoTime();
 		int nPrimes = 0;
@@ -115,7 +118,7 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	public int getCapacity() {
-		throw new UnsupportedOperationException("Method not implemented");
+		return (int) Math.floor(max * maxLoad);
 	}
 	
 	/**
