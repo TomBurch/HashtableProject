@@ -56,7 +56,7 @@ public class Hashtable<V> {
 		//}
 		
 		for (int i = 1; i <= 100; i++) {
-			System.out.println(nextPrime(i));
+			//System.out.println(nextPrime(i));
 		}
 		
 		long t2 = System.nanoTime();
@@ -110,7 +110,8 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	public double getLoadFactor() {
-		throw new UnsupportedOperationException("Method not implemented");
+		//Round to 2 dp
+		return Math.round((((double) itemCount / (double) max) * 100.0)) / 100.0;
 	}
 
 	/**
