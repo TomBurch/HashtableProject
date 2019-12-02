@@ -17,7 +17,7 @@ public class Hashtable<V> {
 
 	private Object[] arr; //an array of Pair objects, where each pair contains the key and value stored in the hashtable
 	private int max; //the size of arr. This should be a prime number
-	private int itemCount; //the number of items stored in arr
+	private int itemCount = 0; //the number of items stored in arr
 	private final double maxLoad = 0.6; //the maximum load factor
 
 	public static enum PROBE_TYPE {
@@ -42,8 +42,13 @@ public class Hashtable<V> {
 	public Hashtable(int initialCapacity) {
 		//Set max size so that max * maxLoad = initialCapacity
 		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));
+		probeType = PROBE_TYPE.LINEAR_PROBE;
+		
+		//System.out.println(getNextLocation(itemCount - 1, 0, ""));
 		
 		System.out.println(max);
+		
+		int h = hash("a");
 		
 		long t1 = System.nanoTime();
 		int nPrimes = 0;
@@ -75,6 +80,7 @@ public class Hashtable<V> {
 	 * @param value
 	 */
 	public void put(String key, V value) {
+		//int location = getNextLocation(itemCount - 1, 2, key);
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 
@@ -204,7 +210,22 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	private int hash(String key) {
-		throw new UnsupportedOperationException("Method not implemented");
+		//Must convert to use BigIntegers
+		key = key.toLowerCase();
+		int hugeKey = 0;
+		int power = key.length() - 1;
+		for (int i = 0; i < key.length(); i++) {
+			int c = (int) key.charAt(i); //Convert character to ASCII
+			hugeKey += c * Math.pow(27, power);
+			power -= 1;
+			System.out.print(hugeKey);
+			System.out.print(" - ");
+			System.out.print(power + 1);
+			System.out.print("\n");
+		}
+		int index = hugeKey % max;
+		System.out.println(index);
+		return index;
 	}
 
 	/**
