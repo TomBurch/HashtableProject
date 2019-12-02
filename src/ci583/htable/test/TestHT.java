@@ -80,7 +80,7 @@ public class TestHT {
 	
 	@Test
 	public void testKeys() {
-		Hashtable<Integer> h = new Hashtable<Integer>(20, Hashtable.PROBE_TYPE.LINEAR_PROBE);
+		Hashtable<Integer> h = new Hashtable<Integer>(20); //add linear probetype back
 		h.put("bananas", 1);
 		h.put("pyjamas", 99);
 		h.put("kedgeree", 1);
