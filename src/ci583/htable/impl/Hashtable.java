@@ -12,6 +12,7 @@ package ci583.htable.impl;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Random;
+import java.util.Arrays;
 
 public class Hashtable<V> {
 
@@ -33,6 +34,7 @@ public class Hashtable<V> {
 	 * @param pt
 	 */
 	public Hashtable(int initialCapacity, PROBE_TYPE pt) {
+		this(initialCapacity);
 	}
 	
 	/**
@@ -41,12 +43,13 @@ public class Hashtable<V> {
 	 */
 	public Hashtable(int initialCapacity) {
 		//Set max size so that max * maxLoad = initialCapacity
-		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));
+		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));		
 		probeType = PROBE_TYPE.LINEAR_PROBE;
 		
-		//System.out.println(getNextLocation(itemCount - 1, 0, ""));
+		arr = new Object[max];
+		System.out.println("Array size: " + max);
 		
-		System.out.println(max);
+		//System.out.println(getNextLocation(itemCount - 1, 0, ""));
 		
 		int h = hash("a");
 		
@@ -65,7 +68,7 @@ public class Hashtable<V> {
 		}
 		
 		long t2 = System.nanoTime();
-		System.out.println(nPrimes);
+		//System.out.println(nPrimes);
 		System.out.println((t2 - t1) / 1000000000.0);
 	}
 
@@ -80,8 +83,14 @@ public class Hashtable<V> {
 	 * @param value
 	 */
 	public void put(String key, V value) {
+		Pair pair = new Pair(key, value);
+		int index = hash(key);
+		System.out.printf("Putting pair(%s, %s) at index: %s%n", key, value, index);
+		arr[index] = pair;
+		System.out.println(Arrays.toString(arr));
+		
 		//int location = getNextLocation(itemCount - 1, 2, key);
-		throw new UnsupportedOperationException("Method not implemented");
+		//throw new UnsupportedOperationException("Method not implemented");
 	}
 
 	/**
@@ -125,7 +134,7 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	public int getCapacity() {
-		return (int) Math.floor(max * maxLoad);
+		return (int) Math.ceil(max * maxLoad);
 	}
 	
 	/**
@@ -218,13 +227,12 @@ public class Hashtable<V> {
 			int c = (int) key.charAt(i); //Convert character to ASCII
 			hugeKey += c * Math.pow(27, power);
 			power -= 1;
-			System.out.print(hugeKey);
-			System.out.print(" - ");
-			System.out.print(power + 1);
-			System.out.print("\n");
+			//System.out.print(hugeKey);
+			//System.out.print(" - ");
+			//System.out.print(power + 1);
+			//System.out.print("\n");
 		}
 		int index = hugeKey % max;
-		System.out.println(index);
 		return index;
 	}
 
@@ -254,21 +262,6 @@ public class Hashtable<V> {
 			}			
 		}
 		return true; //Possibly a prime
-		
-		
-		//if (n <= 3) {
-		//	return (n > 1);
-		//} else if (n % 2 == 0 || n % 3 == 0) {
-	//		return false;
-		//}
-		//int i = 5;
-		//while (i*i <= n) {
-		//	if (n % i == 0 || n % (i + 2) == 0) {
-		//		return false;
-		//	}
-		//	i += 6;
-		//}
-		//return true;
 	}
 
 	/**
@@ -300,8 +293,30 @@ public class Hashtable<V> {
 	 * the underlying array should be the smallest prime number which is at least twice the size
 	 * of the old array.
 	 */
-	private void resize() {
-		throw new UnsupportedOperationException("Method not implemented");
+	@SuppressWarnings("unchecked") //Remove error on Pair cast
+	public void resize() {
+		//Create a larger array
+		int newMax = nextPrime(max * 2);
+		Object[] newArr = new Object[newMax];
+		max = newMax;
+		
+		System.out.println("Resize - Array size: " + max);
+		
+		//Rehash each value in old array
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] != null) {
+				Pair pair = (Pair) arr[i];
+				int newIndex = hash(pair.key);
+				newArr[newIndex] = pair;
+				
+				System.out.printf("Resize - Putting pair(%s, %s) at index: %s%n", pair.key, pair.value, newIndex);
+			}
+		}
+		
+		//Replace old array
+		arr = newArr;
+		System.out.println("Resize finished:");
+		System.out.println(Arrays.toString(arr));
 	}
 
 	
@@ -318,6 +333,12 @@ public class Hashtable<V> {
 		public Pair(String key, V value) {
 			this.key = key;
 			this.value = value;
+		}
+		
+		@Override
+		public String toString() {
+			String out = String.format("[%s, %s]", key, value);
+			return out;
 		}
 	}
 

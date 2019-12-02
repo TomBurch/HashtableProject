@@ -18,6 +18,13 @@ public class TestHT {
 	}
 	
 	@Test
+	public void personalTesting() {
+		Hashtable<Integer> h = new Hashtable<Integer>(25);
+		h.put("abc", 4);
+		h.resize();
+	}
+	
+	@Test
 	public void testEmpty() {
 		Hashtable<Boolean> h = new Hashtable<Boolean>(100);
 		assertNull(h.get("foo"));
@@ -84,6 +91,8 @@ public class TestHT {
 		h.put("bananas", 1);
 		h.put("pyjamas", 99);
 		h.put("kedgeree", 1);
+		h.put("abc", 2);
+		h.put("def", 4);
 		for(String k: h.getKeys()) {
 			assertTrue(k.equals("bananas") || k.equals("pyjamas") || k.equals("kedgeree"));
 		}
