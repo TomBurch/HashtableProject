@@ -64,15 +64,13 @@ public class Hashtable<V> {
 	 * @param key
 	 * @param value
 	 */
-	@SuppressWarnings("unchecked")
 	public void put(String key, V value) {
 		int index = hash(key);
-		int existingIndex = hasKey(key);
+		V existingValue = find(index, key, 0);
 		
-		if (existingIndex != -1) {
-			Pair pair = (Pair) arr[existingIndex];
-			System.out.println(pair + " already exists");
-			pair.value = value;
+		if (existingValue != null) {
+			System.out.printf("Key '%s' already exists%n", key);
+			existingValue = value;
 			System.out.printf("Overwritten, new value: %s%n%n", value);
 		} else {
 			Pair pair = new Pair(key, value);
@@ -104,22 +102,16 @@ public class Hashtable<V> {
 	}
 
 	/**
-	 * Return index of pair if the Hashtable contains this key, -1 otherwise 
+	 * Return true if the Hashtable contains this key, false otherwise 
 	 * @param key
 	 * @return
 	 */
-	public int hasKey(String key) {
+	public boolean hasKey(String key) {
 		int index = hash(key);
-		int stepNum = 0;
-		while (arr[index] != null) {
-			Pair pair = (Pair) arr[index];
-			if (pair.key == key) {
-				return index;
-			}
-			stepNum++;
-			index = getNextLocation(index, key, stepNum);
+		if (find(index, key, 0) == null) {
+			return false;
 		}
-		return -1;
+		return true;
 	}
 
 	/**
@@ -161,7 +153,16 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	private V find(int startPos, String key, int stepNum) {
-		throw new UnsupportedOperationException("Method not implemented");
+		Pair pair = (Pair) arr[startPos];
+		if (pair == null) {
+			return null;
+		} else if (pair.key == key) {
+			return pair.value;
+		} else {
+			stepNum++;
+			startPos = getNextLocation(startPos, key, stepNum);
+			return find(startPos, key, stepNum);
+		}
 	}
 
 	/**
