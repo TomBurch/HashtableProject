@@ -85,13 +85,18 @@ public class Hashtable<V> {
 	public void put(String key, V value) {
 		Pair pair = new Pair(key, value);
 		int index = hash(key);
+		System.out.println("\nOriginal index: " + index);
+		index = findEmpty(index, key, 0);
+		System.out.println("Empty index: " + index);
+		
 		System.out.printf("Putting pair(%s, %s) at index: %s%n", key, value, index);
 		arr[index] = pair;
 		itemCount += 1;
-		System.out.println(Arrays.toString(arr));
+		//System.out.println(Arrays.toString(arr));
 		
 		if (getLoadFactor() >= maxLoad) {
-			System.out.println("\nMax load exceeded, resizing.");
+			System.out.println(getLoadFactor() + " - " + maxLoad);
+			System.out.println("\nMax load exceeded, resizing\n===========================");
 			resize();
 		}
 		
@@ -170,8 +175,15 @@ public class Hashtable<V> {
 	 * @param key
 	 * @return
 	 */
-	private int findEmpty(int startPos, int stepNum, String key) {
-		throw new UnsupportedOperationException("Method not implemented");
+	@SuppressWarnings("unchecked") //Remove warning on pair
+	private int findEmpty(int startPos, String key, int stepNum) {
+		Pair pair = (Pair) arr[startPos];		
+		if (pair == null) {
+			return startPos;
+		}
+		stepNum++;
+		startPos = getNextLocation(startPos, key, stepNum);
+		return findEmpty(startPos, key, stepNum);
 	}
 
 	/**
@@ -184,7 +196,7 @@ public class Hashtable<V> {
 	 * @param key
 	 * @return
 	 */
-	private int getNextLocation(int startPos, int stepNum, String key) {
+	private int getNextLocation(int startPos, String key, int stepNum) {
 		int step = startPos;
 		switch (probeType) {
 		case LINEAR_PROBE:
@@ -304,26 +316,25 @@ public class Hashtable<V> {
 		//Create a larger array
 		int newMax = nextPrime(max * 2);
 		Object[] newArr = new Object[newMax];
-		max = newMax;
+		Object[] oldArr = arr;
 		
-		System.out.println("Resize - Array size: " + max);
+		arr = newArr;
+		max = newMax;
+		itemCount = 0;
+		System.out.println("New array size: " + max);
 		
 		//Rehash each value in old array
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] != null) {
-				Pair pair = (Pair) arr[i];
-				int newIndex = hash(pair.key);
-				newArr[newIndex] = pair;
-				
-				System.out.printf("Resize - Putting pair(%s, %s) at index: %s%n", pair.key, pair.value, newIndex);
+		for (int i = 0; i < oldArr.length; i++) {
+			if (oldArr[i] != null) {
+				Pair pair = (Pair) oldArr[i];
+				put(pair.key, pair.value);
 			}
 		}
 		
 		//Replace old array
-		arr = newArr;
-		System.out.println("Resize finished, new array:");
+		System.out.println("\nResize finished, new array:");
 		System.out.println(Arrays.toString(arr));
-		System.out.print("\n");
+		System.out.println("===========================");
 	}
 
 	
