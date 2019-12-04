@@ -19,15 +19,20 @@ public class TestHT {
 	
 	@Test
 	public void personalTesting() {
-		Hashtable<Integer> h = new Hashtable<Integer>(3);
-		h.put("abc", 4);
-		h.put("def", 5);
-		h.put("ghi", 6);
-		h.put("ghi", 7);
-		h.put("ghi", 8);
-		h.put("ghi", 9);
-		h.put("ghi", 10);
-		//h.resize();
+		Hashtable<String> h = new Hashtable<String>(9);
+		for(int i=0;i<10;i++) {
+			for(int j=10;j>0;j--) {
+				h.put(i+":"+j, j+":"+i);
+			}
+		}
+		
+		//for(int i=0;i<10;i++) {
+		//	for(int j=10;j>0;j--) {
+		//		assertEquals(h.get(i+":"+j), j+":"+i);
+		//	}
+		//}
+		
+		System.out.println(h.get("0:10"));
 	}
 	
 	@Test

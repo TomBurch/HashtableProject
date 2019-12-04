@@ -36,6 +36,7 @@ public class Hashtable<V> {
 	public Hashtable(int initialCapacity, PROBE_TYPE pt) {
 		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));
 		arr = new Object[max];
+		probeType = PROBE_TYPE.LINEAR_PROBE;
 		
 		System.out.printf("%nArray size: %s, Probe type: %s%n", max, probeType);
 	}
@@ -155,11 +156,12 @@ public class Hashtable<V> {
 	 * @param stepNum
 	 * @return
 	 */
+	@SuppressWarnings("unchecked") //Remove pair warning
 	private V find(int startPos, String key, int stepNum) {
 		Pair pair = (Pair) arr[startPos];
-		if (pair == null) {
+		if (arr[startPos] == null) {
 			return null;
-		} else if (pair.key == key) {
+		} else if (key.equals(pair.key)) {
 			return pair.value;
 		} else {
 			stepNum++;
