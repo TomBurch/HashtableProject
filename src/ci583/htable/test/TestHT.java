@@ -19,9 +19,11 @@ public class TestHT {
 	
 	@Test
 	public void personalTesting() {
-		Hashtable<Integer> h = new Hashtable<Integer>(25);
+		Hashtable<Integer> h = new Hashtable<Integer>(3);
 		h.put("abc", 4);
-		h.resize();
+		h.put("def", 5);
+		h.put("ghi", 6);
+		//h.resize();
 	}
 	
 	@Test

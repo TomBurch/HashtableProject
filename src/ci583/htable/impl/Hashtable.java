@@ -87,7 +87,13 @@ public class Hashtable<V> {
 		int index = hash(key);
 		System.out.printf("Putting pair(%s, %s) at index: %s%n", key, value, index);
 		arr[index] = pair;
+		itemCount += 1;
 		System.out.println(Arrays.toString(arr));
+		
+		if (getLoadFactor() >= maxLoad) {
+			System.out.println("\nMax load exceeded, resizing.");
+			resize();
+		}
 		
 		//int location = getNextLocation(itemCount - 1, 2, key);
 		//throw new UnsupportedOperationException("Method not implemented");
@@ -315,8 +321,9 @@ public class Hashtable<V> {
 		
 		//Replace old array
 		arr = newArr;
-		System.out.println("Resize finished:");
+		System.out.println("Resize finished, new array:");
 		System.out.println(Arrays.toString(arr));
+		System.out.print("\n");
 	}
 
 	
