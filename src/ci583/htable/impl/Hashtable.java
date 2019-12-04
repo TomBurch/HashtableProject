@@ -34,7 +34,10 @@ public class Hashtable<V> {
 	 * @param pt
 	 */
 	public Hashtable(int initialCapacity, PROBE_TYPE pt) {
-		this(initialCapacity);
+		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));
+		arr = new Object[max];
+		
+		System.out.printf("%nArray size: %s, Probe type: %s%n", max, probeType);
 	}
 	
 	/**
@@ -48,7 +51,7 @@ public class Hashtable<V> {
 		probeType = PROBE_TYPE.LINEAR_PROBE;
 		
 		arr = new Object[max];
-		System.out.println("Array size: " + max);
+		System.out.printf("%nArray size: %s, Probe type: %s%n", max, probeType);
 				
 		long t2 = System.nanoTime();
 		System.out.println((t2 - t1) / 1000000000.0);
@@ -66,7 +69,7 @@ public class Hashtable<V> {
 	 */
 	public void put(String key, V value) {
 		int index = hash(key);
-		V existingValue = find(index, key, 0);
+		V existingValue = get(key);
 		
 		if (existingValue != null) {
 			System.out.printf("Key '%s' already exists%n", key);
@@ -98,7 +101,8 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	public V get(String key) {
-		throw new UnsupportedOperationException("Method not implemented");
+		int index = hash(key);
+		return find(index, key, 0);
 	}
 
 	/**
@@ -107,8 +111,7 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	public boolean hasKey(String key) {
-		int index = hash(key);
-		if (find(index, key, 0) == null) {
+		if (get(key) == null) {
 			return false;
 		}
 		return true;
