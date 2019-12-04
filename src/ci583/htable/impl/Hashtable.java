@@ -42,33 +42,15 @@ public class Hashtable<V> {
 	 * @param initialCapacity
 	 */
 	public Hashtable(int initialCapacity) {
+		long t1 = System.nanoTime();
 		//Set max size so that max * maxLoad = initialCapacity
 		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));		
 		probeType = PROBE_TYPE.LINEAR_PROBE;
 		
 		arr = new Object[max];
 		System.out.println("Array size: " + max);
-		
-		//System.out.println(getNextLocation(itemCount - 1, 0, ""));
-		
-		int h = hash("a");
-		
-		long t1 = System.nanoTime();
-		int nPrimes = 0;
-		
-		//for (int i = 1; i <= 1000000; i++) {
-		//	if (isPrime(i)) {
-		//		//System.out.println(i);
-		//		nPrimes++;
-		//	}
-		//}
-		
-		for (int i = 1; i <= 100; i++) {
-			//System.out.println(nextPrime(i));
-		}
-		
+				
 		long t2 = System.nanoTime();
-		//System.out.println(nPrimes);
 		System.out.println((t2 - t1) / 1000000000.0);
 	}
 
@@ -76,32 +58,39 @@ public class Hashtable<V> {
 	 * Store the value against the given key. If the loadFactor exceeds maxLoad, call the resize 
 	 * method to resize the array. the If key already exists then its value should be overwritten.
 	 * Create a new Pair item containing the key and value, then use the findEmpty method to find an unoccupied 
-	 * position in the array to store the pair. Call findEmmpty with the hashed value of the key as the starting
+	 * position in the array to store the pair. Call findEmpty with the hashed value of the key as the starting
 	 * position for the search, stepNum of zero and the original key.
 	 * containing   
 	 * @param key
 	 * @param value
 	 */
+	@SuppressWarnings("unchecked")
 	public void put(String key, V value) {
-		Pair pair = new Pair(key, value);
 		int index = hash(key);
-		System.out.println("\nOriginal index: " + index);
-		index = findEmpty(index, key, 0);
-		System.out.println("Empty index: " + index);
+		int existingIndex = hasKey(key);
 		
-		System.out.printf("Putting pair(%s, %s) at index: %s%n", key, value, index);
-		arr[index] = pair;
-		itemCount += 1;
-		//System.out.println(Arrays.toString(arr));
+		if (existingIndex != -1) {
+			Pair pair = (Pair) arr[existingIndex];
+			System.out.println(pair + " already exists");
+			pair.value = value;
+			System.out.printf("Overwritten, new value: %s%n%n", value);
+		} else {
+			Pair pair = new Pair(key, value);
 		
-		if (getLoadFactor() >= maxLoad) {
-			System.out.println(getLoadFactor() + " - " + maxLoad);
-			System.out.println("\nMax load exceeded, resizing\n===========================");
-			resize();
+			System.out.println("\nOriginal index: " + index);
+			index = findEmpty(index, key, 0);
+			System.out.println("Empty index: " + index);
+		
+			System.out.printf("Putting %s at index: %s%n", pair, index);
+			arr[index] = pair;
+			itemCount++;
+			//System.out.println(Arrays.toString(arr));
+			
+			if (getLoadFactor() >= maxLoad) {
+				System.out.println("\nMax load exceeded, resizing\n===========================");
+				resize();
+			}
 		}
-		
-		//int location = getNextLocation(itemCount - 1, 2, key);
-		//throw new UnsupportedOperationException("Method not implemented");
 	}
 
 	/**
@@ -115,12 +104,22 @@ public class Hashtable<V> {
 	}
 
 	/**
-	 * Return true if the Hashtable contains this key, false otherwise 
+	 * Return index of pair if the Hashtable contains this key, -1 otherwise 
 	 * @param key
 	 * @return
 	 */
-	public boolean hasKey(String key) {
-		throw new UnsupportedOperationException("Method not implemented");
+	public int hasKey(String key) {
+		int index = hash(key);
+		int stepNum = 0;
+		while (arr[index] != null) {
+			Pair pair = (Pair) arr[index];
+			if (pair.key == key) {
+				return index;
+			}
+			stepNum++;
+			index = getNextLocation(index, key, stepNum);
+		}
+		return -1;
 	}
 
 	/**
@@ -245,10 +244,6 @@ public class Hashtable<V> {
 			int c = (int) key.charAt(i); //Convert character to ASCII
 			hugeKey += c * Math.pow(27, power);
 			power -= 1;
-			//System.out.print(hugeKey);
-			//System.out.print(" - ");
-			//System.out.print(power + 1);
-			//System.out.print("\n");
 		}
 		int index = hugeKey % max;
 		return index;
