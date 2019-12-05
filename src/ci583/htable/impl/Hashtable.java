@@ -12,6 +12,7 @@ package ci583.htable.impl;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Random;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Hashtable<V> {
@@ -122,8 +123,16 @@ public class Hashtable<V> {
 	 * Return all the keys in this Hashtable as a collection
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public Collection<String> getKeys() {
-		throw new UnsupportedOperationException("Method not implemented");
+		ArrayList<String> keyList = new ArrayList<String>();
+		for (int i = 0; i < arr.length; i++) {
+			Pair pair = (Pair) arr[i];
+			if (pair != null) {
+				keyList.add(pair.key);
+			}
+		}
+		return keyList;
 	}
 
 	/**
