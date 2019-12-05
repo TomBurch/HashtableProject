@@ -74,23 +74,23 @@ public class Hashtable<V> {
 		V existingValue = get(key);
 		
 		if (existingValue != null) {
-			System.out.printf("Key '%s' already exists%n", key);
+			//System.out.printf("Key '%s' already exists%n", key);
 			existingValue = value;
-			System.out.printf("Overwritten, new value: %s%n%n", value);
+			//System.out.printf("Overwritten, new value: %s%n%n", value);
 		} else {
 			Pair pair = new Pair(key, value);
 		
-			System.out.println("\nOriginal index: " + index);
+			//System.out.println("\nOriginal index: " + index);
 			index = findEmpty(index, key, 0);
-			System.out.println("Empty index: " + index);
+			//System.out.println("Empty index: " + index);
 		
-			System.out.printf("Putting %s at index: %s%n", pair, index);
+			//System.out.printf("Putting %s at index: %s%n", pair, index);
 			arr[index] = pair;
 			itemCount++;
 			//System.out.println(Arrays.toString(arr));
 			
 			if (getLoadFactor() >= maxLoad) {
-				System.out.println("\nMax load exceeded, resizing\n===========================");
+				//System.out.println("\nMax load exceeded, resizing\n===========================");
 				resize();
 			}
 		}
@@ -189,7 +189,7 @@ public class Hashtable<V> {
 	 * @param key
 	 * @return
 	 */
-	@SuppressWarnings("unchecked") //Remove warning on pair
+	@SuppressWarnings("unchecked") //Remove pair warning
 	private int findEmpty(int startPos, String key, int stepNum) {
 		Pair pair = (Pair) arr[startPos];		
 		if (pair == null) {
@@ -250,18 +250,19 @@ public class Hashtable<V> {
 	 * @param key
 	 * @return
 	 */
-	private int hash(String key) {
-		//Must convert to use BigIntegers
+	public int hash(String key) {
 		key = key.toLowerCase();
-		int hugeKey = 0;
+		BigInteger hugeKey = BigInteger.ZERO;
+		BigInteger big27 = BigInteger.valueOf(27);
 		int power = key.length() - 1;
 		for (int i = 0; i < key.length(); i++) {
-			int c = (int) key.charAt(i); //Convert character to ASCII
-			hugeKey += c * Math.pow(27, power);
+			int c = (int) key.charAt(i);
+			BigInteger cBig = BigInteger.valueOf(c);
+			hugeKey = hugeKey.add(cBig.multiply(big27.pow(power))); //hugeKey += c * (27^power)
 			power -= 1;
 		}
-		int index = hugeKey % max;
-		return index;
+		
+		return hugeKey.mod(BigInteger.valueOf(max)).intValue(); //hugekey % max
 	}
 
 	/**
@@ -276,7 +277,7 @@ public class Hashtable<V> {
 		
 		if (n == 1) {return false;}
 		
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 200; i++) {
 			//Random number from 1 -> n-1;
 			BigInteger a;
 			do {
@@ -321,7 +322,7 @@ public class Hashtable<V> {
 	 * the underlying array should be the smallest prime number which is at least twice the size
 	 * of the old array.
 	 */
-	@SuppressWarnings("unchecked") //Remove error on Pair cast
+	@SuppressWarnings("unchecked") //Remove pair warning
 	public void resize() {
 		//Create a larger array
 		int newMax = nextPrime(max * 2);
@@ -341,10 +342,9 @@ public class Hashtable<V> {
 			}
 		}
 		
-		//Replace old array
-		System.out.println("\nResize finished, new array:");
-		System.out.println(Arrays.toString(arr));
-		System.out.println("===========================");
+		//System.out.println("\nResize finished, new array:");
+		//System.out.println(Arrays.toString(arr));
+		//System.out.println("===========================");
 	}
 
 	

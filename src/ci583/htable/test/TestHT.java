@@ -19,20 +19,14 @@ public class TestHT {
 	
 	@Test
 	public void personalTesting() {
-		Hashtable<String> h = new Hashtable<String>(9);
-		for(int i=0;i<10;i++) {
-			for(int j=10;j>0;j--) {
-				h.put(i+":"+j, j+":"+i);
-			}
-		}
+		Hashtable<String> h = new Hashtable<String>(1000);
+		//h.put("abcdefghijklmopqvt", "123");
 		
 		//for(int i=0;i<10;i++) {
 		//	for(int j=10;j>0;j--) {
 		//		assertEquals(h.get(i+":"+j), j+":"+i);
 		//	}
 		//}
-		
-		System.out.println(h.get("0:10"));
 	}
 	
 	@Test
