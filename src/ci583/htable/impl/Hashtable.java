@@ -87,7 +87,6 @@ public class Hashtable<V> {
 	 * @param value	Value of the key
 	 */
 	public void put(String key, V value) {
-		int index = hash(key);
 		V existingValue = get(key);
 		
 		//If the key already exists, overwrite its value
@@ -98,6 +97,7 @@ public class Hashtable<V> {
 			//Otherwise create a new pair and store at next empty index
 			Pair pair = new Pair(key, value);
 			
+			int index = hash(key);
 			//System.out.println("\nOriginal index: " + index);
 			index = findEmpty(index, key, 0);
 			arr[index] = pair;
