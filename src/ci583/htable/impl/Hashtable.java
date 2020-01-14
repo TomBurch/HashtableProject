@@ -109,8 +109,8 @@ public class Hashtable<V> {
 
 	/** Get the value associated with key.
 	 * 
-	 * @param 	key	Key to search for
-	 * @return	Associated value, or {@code null} if key is invalid
+	 * @param key Key to search for
+	 * @return Associated value, or {@code null} if key is invalid
 	 */
 	public V get(String key) {
 		int index = hash(key);
