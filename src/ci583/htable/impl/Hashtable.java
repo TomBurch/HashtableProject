@@ -16,11 +16,12 @@ import java.util.regex.Pattern;
 import java.util.ArrayList;
 
 public class Hashtable<V> {
-	/** An array of Pair objects, where each pair contains the key and value stored
+	/** An array of Pair objects, where each pair contains the key and value stored.
 	 */
 	private Object[] arr;
 	
-	/** The size of arr. This should be a prime number
+	/** The size of arr.<br>
+	 *  This should be a prime number.
 	 */
 	private int max;
 	
@@ -29,7 +30,7 @@ public class Hashtable<V> {
 	private int itemCount = 0;
 	
 	/** The maximum load factor.<br> 
-	 *  When {@code (itemCount >= max * maxLoad)} arr is resized
+	 *  When {@code (itemCount >= max * maxLoad)} arr is resized.
 	 *  @see resize
 	 */
 	private final double maxLoad = 0.6;
@@ -77,9 +78,10 @@ public class Hashtable<V> {
 	}
 
 	/** Store the given value against the given key.<br>
-	 * 	If the loadFactor exceeds {@link maxLoad}, then arr is resized.<br>
+	 * 	If the loadFactor exceeds {@link maxLoad}, then Hashtable is resized.<br>
 	 * 	If the key already exists then its value is overwritten.<br>
 	 * @see resize
+	 * @see getLoadFactor
 	 * 	
 	 * @param key	Key used to store value 
 	 * @param value	Value of the key
@@ -92,32 +94,33 @@ public class Hashtable<V> {
 		if (existingValue != null) {	
 			existingValue = value;
 		} else {
+			//Otherwise create a new pair and store at next empty index
 			Pair pair = new Pair(key, value);
 			index = findEmpty(index, key, 0);
 			arr[index] = pair;
 			itemCount++;
 			
+			//Check if resize is necessary
 			if (getLoadFactor() >= maxLoad) {
 				resize();
 			}
 		}
 	}
 
-	/**
-	 * Get the value associated with key, or return null if key does not exists. Use the find method to search the
-	 * array, starting at the hashed value of the key, stepNum of zero and the original key.
-	 * @param key
-	 * @return
+	/** Get the value associated with key.
+	 * 
+	 * @param 	key	Key to search for
+	 * @return	Associated value, or {@code null} if key is invalid
 	 */
 	public V get(String key) {
 		int index = hash(key);
 		return find(index, key, 0);
 	}
 
-	/**
-	 * Return true if the Hashtable contains this key, otherwise false
+	/** Check if Hashtable contains the given key.
+	 * 
 	 * @param key
-	 * @return
+	 * @return (bool) {@code true} if Hashtable contains key, {@code false} otherwise
 	 */
 	public boolean hasKey(String key) {
 		if (get(key) == null) {
@@ -126,15 +129,14 @@ public class Hashtable<V> {
 		return true;
 	}
 
-	/**
-	 * Return all the keys in this Hashtable as a collection
-	 * @return
+	/** Return all the keys in the Hashtable as a collection.
+	 * 
+	 * @return ArrayList of keys
 	 */
-	@SuppressWarnings("unchecked") //Remove pair warning
 	public Collection<String> getKeys() {
 		ArrayList<String> keyList = new ArrayList<String>();
 		
-		//Loop through each Pair in arr and add key to keyList
+		//Loop through each Pair in arr and add their key to keyList
 		for (int i = 0; i < arr.length; i++) {
 			Pair pair = (Pair) arr[i];
 			if (pair != null) {
@@ -144,8 +146,8 @@ public class Hashtable<V> {
 		return keyList;
 	}
 
-	/**
-	 * Return the load factor, which is the ratio of itemCount to max
+	/**Return the load factor, which is the ratio of {@link itemCount} to {@link max}
+	 * 
 	 * @return
 	 */
 	public double getLoadFactor() {
@@ -153,50 +155,46 @@ public class Hashtable<V> {
 		return Math.round((((double) itemCount / (double) max) * 100.0)) / 100.0;
 	}
 
-	/**
-	 * Return the maximum capacity of the Hashtable
-	 * @return
+	/** Return the maximum capacity of the Hashtable
+	 * 
+	 * @return {@link max}
 	 */
 	public int getCapacity() {
 		return max;
 	}
 	
-	/**
-	 * Find the value stored for this key, starting the search at position startPos in the array. If
-	 * the item at position startPos is null, the Hashtable does not contain the value, so return null. 
-	 * If the key stored in the pair at position startPos matches the key we're looking for, return the associated 
-	 * value. If the key stored in the pair at position startPos does not match the key we're looking for, this
-	 * is a hash collision so use the getNextLocation method with an incremented value of stepNum to find 
-	 * the next location to search (the way that this is calculated will differ depending on the probe type 
-	 * being used). Then use the value of the next location in a recursive call to find.
-	 * @param startPos
-	 * @param key
-	 * @param stepNum
-	 * @return
+	/** Recursively find the value stored for the given key.
+	 * @see getNextLocation
+	 * 
+	 * @param startPos	Index to start at, usually hash of key.
+	 * @param key		Key being searched for
+	 * @param stepNum	Used as increment in {@code QUADRATIC_PROBE}
+	 * @return value stored with key if found, {@code null} otherwise
 	 */
-	@SuppressWarnings("unchecked") //Remove pair warning
 	private V find(int startPos, String key, int stepNum) {
 		Pair pair = (Pair) arr[startPos];
+		
+		//If pair is null, key is not stored
 		if (arr[startPos] == null) {
 			return null;
 		} else if (key.equals(pair.key)) {
+			//If key is found, return its value
 			return pair.value;
 		} else {
+			//Hash collision, find next index to check
 			stepNum++;
 			startPos = getNextLocation(startPos, key, stepNum);
 			return find(startPos, key, stepNum);
 		}
 	}
 
-	/**
-	 * Find the first unoccupied location where a value associated with key can be stored, starting the
-	 * search at position startPos. If startPos is unoccupied, return startPos. Otherwise use the getNextLocation
-	 * method with an incremented value of stepNum to find the appropriate next position to check 
-	 * (which will differ depending on the probe type being used) and use this in a recursive call to findEmpty.
-	 * @param startPos
-	 * @param stepNum
-	 * @param key
-	 * @return
+	/** Recursively find the first unoccupied location where a value associated with key can be stored.
+	 * @see getNextLocation
+	 * 
+	 * @param startPos	Index to start at, usually hash of key
+	 * @param stepNum	Used as increment in {@code QUADRATIC_PROBE}
+	 * @param key		Key used for search
+	 * @return (int) Empty index where key can be stored
 	 */
 	@SuppressWarnings("unchecked") //Remove pair warning
 	private int findEmpty(int startPos, String key, int stepNum) {
@@ -209,26 +207,28 @@ public class Hashtable<V> {
 		return findEmpty(startPos, key, stepNum);
 	}
 
-	/**
-	 * Finds the next position in the Hashtable array starting at position startPos. If the linear
-	 * probe is being used, we just increment startPos. If the double hash probe type is being used, 
-	 * add the double hashed value of the key to startPos. If the quadratic probe is being used, add
-	 * the square of the step number to startPos.
-	 * @param i
-	 * @param stepNum
-	 * @param key
-	 * @return
+	/** Finds the next index in the Hashtable depending on probe_type {@code PROBE_TYPE}.
+	 * 
+	 * @param startPos 	Index to start with
+	 * @param key		Key used by {@code DOUBLE_HASH}	
+	 * @param stepNum	Used as increment by {@code QUADRATIC_PROBE}
+	 * @return (int) Next index
+	 * 
+	 * @author jb259
 	 */
 	private int getNextLocation(int startPos, String key, int stepNum) {
 		int step = startPos;
 		switch (probeType) {
 		case LINEAR_PROBE:
+			//Just increment startPos
 			step++;
 			break;
 		case DOUBLE_HASH:
+			//Add the double hashed value of key
 			step += doubleHash(key);
 			break;
 		case QUADRATIC_PROBE:
+			//Add the square of stepNum
 			step += stepNum * stepNum;
 			break;
 		default:
@@ -237,11 +237,13 @@ public class Hashtable<V> {
 		return step % max;
 	}
 
-	/**
-	 * A secondary hash function which returns a small value (less than or equal to DBL_HASH_K)
-	 * to probe the next location if the double hash probe type is being used
+	/** A secondary hash function which returns a small value (<= {@code DBL_HASH_K})
+	 * 	to probe the next location if the {@code DOUBLE_HASH} probe type is being used
+	 * 
 	 * @param key
 	 * @return
+	 * 
+	 * @author jb259
 	 */
 	private int doubleHash(String key) {
 		BigInteger hashVal = BigInteger.valueOf(key.charAt(0) - 96);
@@ -252,72 +254,65 @@ public class Hashtable<V> {
 		return DBL_HASH_K.subtract(hashVal.mod(DBL_HASH_K)).intValue();
 	}
 
-	/**
-	 * Return an int value calculated by hashing the key. See the lecture slides for information
-	 * on creating hash functions. The return value should be less than max, the maximum capacity 
-	 * of the array
-	 * @param key
-	 * @return
+	/** Hash the given key
+	 * 
+	 * @param key Key to hash
+	 * @return (int) Hashed key
 	 */
-	/*
-		private int hash(String key) {
-		key = key.toLowerCase();
-		BigInteger hugeKey = BigInteger.ZERO;
-		BigInteger radix = BigInteger.valueOf(27);
-		int power = key.length() - 1;
-		for (int i = 0; i < key.length(); i++) {
-			int c = (int) key.charAt(i) - 96;
-			BigInteger cBig = BigInteger.valueOf(c);
-			hugeKey = hugeKey.add(cBig.multiply(radix.pow(power))); //hugeKey += c * (27^power)
-			power -= 1;
-		}
-		
-		return hugeKey.mod(BigInteger.valueOf(max)).intValue(); //hugekey % max
-	}
-	*/
-	
 	private int hash(String key) {
 		BigInteger hugeKey = BigInteger.ZERO;
-		BigInteger radix = BigInteger.valueOf(79);
+		BigInteger radix = BigInteger.valueOf(79); //Number of allowed characters (charPattern)
 		int power = key.length() - 1;
+		
+		//For each character in key...
 		for (int i = 0; i < key.length(); i++) {
-			int c = encode(key.charAt(i)); //Convert char to int if valid character
-			BigInteger cBig = BigInteger.valueOf(c);
-			hugeKey = hugeKey.add(cBig.multiply(radix.pow(power))); //hugeKey += c * (79^power)
+			int c = encode(key.charAt(i)); //Convert character to ASCII value
+			BigInteger cBig = BigInteger.valueOf(c); //Convert ASCII value to BigInteger
+			hugeKey = hugeKey.add(cBig.multiply(radix.pow(power))); //hugeKey += c * (radix ^ power)
 			power -= 1;
 		}
 		
-		return hugeKey.mod(BigInteger.valueOf(max)).intValue(); //hugekey % max
+		return hugeKey.mod(BigInteger.valueOf(max)).intValue(); //return hugeKey % max
 	}
 	
+	/**	Encode the given char for use in hashing.
+	 * @see hash
+	 * 
+	 * @param c Character to encode
+	 * @return (int) Character converted to ASCII
+	 * @throws IllegalArgumentException If character is not valid
+	 */
 	private int encode(char c) throws IllegalArgumentException {
-		int encode;
+		//If char is in charPattern, convert to ASCII and return
 		if (charPattern.matcher(String.valueOf(c)).find()) {
-			encode = (int) c;
+			return (int) c;
 		} else {
 			throw new IllegalArgumentException("Invalid character in key: '" + c + "'");
 		}
-		return encode;
 	}
 
-	/**
-	 * Return true if n is prime
-	 * @param n
-	 * @return
+	/** Check if int is prime using Fermat primality test
+	 * @see https://en.wikipedia.org/wiki/Fermat_primality_test
+	 * 
+	 * @param n	Int to check primality of
+	 * @return {@code true} if int is probably prime, {@code false} otherwise
 	 */
 	private boolean isPrime(int n) {
-		//Fermat primality test
-		Random rand = new Random();
-		BigInteger nBig = new BigInteger(Integer.toString(n)); //Convert n to BigInteger
+		//Base cases
+		if (n == 0 || n == 1) { return false; }
+		if (n == 2) { return true; }
+		if (n % 2 == 0) { return false; }
 		
-		if (n == 1) {return false;}
+		Random rand = new Random();
+		BigInteger nBig = BigInteger.valueOf(n); //Convert n to BigInteger
 		
 		for (int i = 0; i < 200; i++) {
-			//Random number from 1 -> n-1;
+			//Generate random number from 1 -> n-1;
+			//Credit to https://stackoverflow.com/questions/2290057/how-to-generate-a-random-biginteger-value-in-java
 			BigInteger a;
 			do {
 				a = new BigInteger(nBig.bitLength(), rand);
-			} while (!(a.compareTo(BigInteger.ONE) >= 0 && a.compareTo(nBig) == -1));
+			} while (!(a.compareTo(BigInteger.ONE) >= 0 && a.compareTo(nBig) == -1)); 
 			
 			BigInteger aModPow = a.modPow(nBig.subtract(BigInteger.ONE), nBig); //(a ^ (n-1)) % n
 			
@@ -325,51 +320,47 @@ public class Hashtable<V> {
 				return false; //Definitely not a prime
 			}			
 		}
-		return true; //Possibly a prime
+		return true; //Probably a prime
 	}
 
-	/**
-	 * Get the smallest prime number which is larger than n
+	/** Get the smallest prime number which is larger than n
+	 * 
 	 * @param n
-	 * @return
+	 * @return (int) Prime number
 	 */
 	private int nextPrime(int n) {
 		int i;
-		//Set i to closest odd number
+		//Set i to next odd number
 		if (n % 2 == 0) {
 			i = n + 1;
 		} else {
 			i = n;
 		}
 		
-		//Check every odd number between n and 2*n
+		//Check primality of every odd number between n and 2*n
 		for (; i < 2 * n; i += 2) {
 			if (isPrime(i)) {
 				break;
 			}
 		}
-		
 		return i;
 	}
 
-	/**
-	 * Resize the hashtable, to be used when the load factor exceeds maxLoad. The new size of
-	 * the underlying array should be the smallest prime number which is at least twice the size
-	 * of the old array.
+	/**	Resize the hashtable, to be used when the load factor exceeds {@link maxLoad}.<br>
+	 *  The new size of the array is the smallest prime number which is at least twice the size of the old array.
 	 */
-	@SuppressWarnings("unchecked") //Remove pair warning
 	public void resize() {
-		//Create a larger array
+		//Create the larger array
 		int newMax = nextPrime(max * 2);
 		Object[] newArr = new Object[newMax];
 		Object[] oldArr = arr;
 		
+		//Change Hashtable values to reflect new array
 		arr = newArr;
 		max = newMax;
 		itemCount = 0;
-		System.out.println("New array size: " + max);
 		
-		//Rehash each value in old array
+		//Put each value of the old array in the new array
 		for (int i = 0; i < oldArr.length; i++) {
 			if (oldArr[i] != null) {
 				Pair pair = (Pair) oldArr[i];
@@ -379,14 +370,10 @@ public class Hashtable<V> {
 	}
 
 	
-	/**
-	 * Instances of Pair are stored in the underlying array. We can't just store
-	 * the value because we need to check the original key in the case of collisions.
-	 * @author jb259
-	 *
+	/**Pair object used to store keys and values
 	 */
 	private class Pair {
-		private String key;
+		private String key; //The key used to store the Pair, to check for hash collisions
 		private V value;
 
 		public Pair(String key, V value) {
