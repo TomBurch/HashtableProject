@@ -93,15 +93,20 @@ public class Hashtable<V> {
 		//If the key already exists, overwrite its value
 		if (existingValue != null) {	
 			existingValue = value;
+			System.out.printf("Key: '%s' overwritten, new value: %s%n%n", key, value);
 		} else {
 			//Otherwise create a new pair and store at next empty index
 			Pair pair = new Pair(key, value);
+			
+			//System.out.println("\nOriginal index: " + index);
 			index = findEmpty(index, key, 0);
 			arr[index] = pair;
 			itemCount++;
+			//System.out.printf("Put %s at index: %s%n", pair, index);
 			
 			//Check if resize is necessary
 			if (getLoadFactor() >= maxLoad) {
+				System.out.println("\nMax load exceeded, resizing\n===========================");
 				resize();
 			}
 		}
@@ -148,7 +153,7 @@ public class Hashtable<V> {
 
 	/**Return the load factor, which is the ratio of {@link itemCount} to {@link max}
 	 * 
-	 * @return
+	 * @return (double) load factor
 	 */
 	public double getLoadFactor() {
 		//Round (itemCount / max) to 2 dp
@@ -359,6 +364,7 @@ public class Hashtable<V> {
 		arr = newArr;
 		max = newMax;
 		itemCount = 0;
+		System.out.println("New array size: " + max);
 		
 		//Put each value of the old array in the new array
 		for (int i = 0; i < oldArr.length; i++) {
