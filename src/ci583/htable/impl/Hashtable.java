@@ -14,29 +14,38 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
-import java.util.Arrays; //For printing arr (Arrays.toString())
 
 public class Hashtable<V> {
-	/**An array of Pair objects, where each pair contains the key and value stored*/
+	/** An array of Pair objects, where each pair contains the key and value stored
+	 */
 	private Object[] arr;
 	
-	/**The size of arr. This should be a prime number*/
+	/** The size of arr. This should be a prime number
+	 */
 	private int max;
 	
-	/**The number of Pair objects stored in arr*/
+	/** The number of Pair objects stored in arr
+	 */
 	private int itemCount = 0;
 	
-	/**The maximum load factor. When {@code itemCount >= max * maxLoad} arr is resized*/
+	/** The maximum load factor.<br> 
+	 *  When {@code (itemCount >= max * maxLoad)} arr is resized
+	 *  @see resize
+	 */
 	private final double maxLoad = 0.6;
 	
-	/**All characters that are allowed in keys*/
+	/** All characters that are allowed in keys
+	 *  @see encode
+	 */
 	private final Pattern charPattern = Pattern.compile("[a-zA-Z0-9:!?#%&*+_./:<>=@ ]");
 
 	public static enum PROBE_TYPE {
 		LINEAR_PROBE, QUADRATIC_PROBE, DOUBLE_HASH;
 	}
 
-	/**The type of probe to use when dealing with collisions*/
+	/** The type of probe to use when dealing with collisions,<br>
+	 *  Defaults to {@code LINEAR_PROBE}
+	 */
 	PROBE_TYPE probeType;
 	
 	private final BigInteger DBL_HASH_K = BigInteger.valueOf(8);
@@ -67,13 +76,11 @@ public class Hashtable<V> {
 		System.out.printf("%nArray size: %s, Probe type: %s%n", max, probeType);
 	}
 
-	/** Store the value against the given key. If the loadFactor exceeds maxLoad, resize the array. 
-	 * 	If key already exists then its value should be overwritten.
-	 * 	Create a new Pair item containing the key and value, then use the findEmpty method to find an unoccupied 
-	 * 	position in the array to store the pair. Call findEmpty with the hashed value of the key as the starting
-	 * 	position for the search, stepNum of zero and the original key.
-	 * 	containing   
-	 * 
+	/** Store the given value against the given key.<br>
+	 * 	If the loadFactor exceeds {@link maxLoad}, then arr is resized.<br>
+	 * 	If the key already exists then its value is overwritten.<br>
+	 * @see resize
+	 * 	
 	 * @param key	Key used to store value 
 	 * @param value	Value of the key
 	 */
@@ -81,24 +88,16 @@ public class Hashtable<V> {
 		int index = hash(key);
 		V existingValue = get(key);
 		
-		if (existingValue != null) {
-			//System.out.printf("Key '%s' already exists%n", key);
+		//If the key already exists, overwrite its value
+		if (existingValue != null) {	
 			existingValue = value;
-			//System.out.printf("Overwritten, new value: %s%n%n", value);
 		} else {
 			Pair pair = new Pair(key, value);
-		
-			System.out.println("\nOriginal index: " + index);
 			index = findEmpty(index, key, 0);
-			System.out.println("Empty index: " + index);
-		
-			System.out.printf("Putting %s at index: %s%n", pair, index);
 			arr[index] = pair;
 			itemCount++;
-			System.out.println(Arrays.toString(arr));
 			
 			if (getLoadFactor() >= maxLoad) {
-				//System.out.println("\nMax load exceeded, resizing\n===========================");
 				resize();
 			}
 		}
@@ -377,10 +376,6 @@ public class Hashtable<V> {
 				put(pair.key, pair.value);
 			}
 		}
-		
-		//System.out.println("\nResize finished, new array:");
-		//System.out.println(Arrays.toString(arr));
-		//System.out.println("===========================");
 	}
 
 	
