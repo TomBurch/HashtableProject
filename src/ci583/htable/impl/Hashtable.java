@@ -12,62 +12,70 @@ package ci583.htable.impl;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Random;
+import java.util.regex.Pattern;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Arrays; //For printing arr (Arrays.toString())
 
 public class Hashtable<V> {
-
-	private Object[] arr; //an array of Pair objects, where each pair contains the key and value stored in the hashtable
-	private int max; //the size of arr. This should be a prime number
-	private int itemCount = 0; //the number of items stored in arr
-	private final double maxLoad = 0.6; //the maximum load factor
+	/**An array of Pair objects, where each pair contains the key and value stored*/
+	private Object[] arr;
+	
+	/**The size of arr. This should be a prime number*/
+	private int max;
+	
+	/**The number of Pair objects stored in arr*/
+	private int itemCount = 0;
+	
+	/**The maximum load factor. When {@code itemCount >= max * maxLoad} arr is resized*/
+	private final double maxLoad = 0.6;
+	
+	/**All characters that are allowed in keys*/
+	private final Pattern charPattern = Pattern.compile("[a-zA-Z0-9:!?#%&*+_./:<>=@ ]");
 
 	public static enum PROBE_TYPE {
 		LINEAR_PROBE, QUADRATIC_PROBE, DOUBLE_HASH;
 	}
 
-	PROBE_TYPE probeType; //the type of probe to use when dealing with collisions
+	/**The type of probe to use when dealing with collisions*/
+	PROBE_TYPE probeType;
+	
 	private final BigInteger DBL_HASH_K = BigInteger.valueOf(8);
 
-	/**
-	 * Create a new Hashtable with a given initial capacity and using a given probe type
-	 * @param initialCapacity
-	 * @param pt
+	/** Creates a new Hashtable with a given initial capacity and using a given {@code PROBE_TYPE}
+	 * 
+	 * @param initialCapacity 	Initial size of the Hashtable
+	 * @param pt				{@code PROBE_TYPE} to use
 	 */
 	public Hashtable(int initialCapacity, PROBE_TYPE pt) {
-		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));
+		max = nextPrime(initialCapacity);
+		probeType = pt;
 		arr = new Object[max];
-		probeType = PROBE_TYPE.LINEAR_PROBE;
 		
 		System.out.printf("%nArray size: %s, Probe type: %s%n", max, probeType);
 	}
 	
-	/**
-	 * Create a new Hashtable with a given initial capacity and using the default probe type
-	 * @param initialCapacity
+	/** Creates a new Hashtable with a given initial capacity and using<br>
+	 * the default {@code PROBE_TYPE}: {@code LINEAR_PROBE}
+	 * 
+	 * @param initialCapacity	Initial size of the Hashtable
 	 */
 	public Hashtable(int initialCapacity) {
-		long t1 = System.nanoTime();
-		//Set max size so that max * maxLoad = initialCapacity
-		max = nextPrime((int) Math.ceil(initialCapacity / maxLoad));		
-		probeType = PROBE_TYPE.LINEAR_PROBE;
-		
+		max = nextPrime(initialCapacity);
+		probeType = PROBE_TYPE.LINEAR_PROBE;	
 		arr = new Object[max];
+		
 		System.out.printf("%nArray size: %s, Probe type: %s%n", max, probeType);
-				
-		long t2 = System.nanoTime();
-		System.out.println((t2 - t1) / 1000000000.0);
 	}
 
-	/**
-	 * Store the value against the given key. If the loadFactor exceeds maxLoad, call the resize 
-	 * method to resize the array. the If key already exists then its value should be overwritten.
-	 * Create a new Pair item containing the key and value, then use the findEmpty method to find an unoccupied 
-	 * position in the array to store the pair. Call findEmpty with the hashed value of the key as the starting
-	 * position for the search, stepNum of zero and the original key.
-	 * containing   
-	 * @param key
-	 * @param value
+	/** Store the value against the given key. If the loadFactor exceeds maxLoad, resize the array. 
+	 * 	If key already exists then its value should be overwritten.
+	 * 	Create a new Pair item containing the key and value, then use the findEmpty method to find an unoccupied 
+	 * 	position in the array to store the pair. Call findEmpty with the hashed value of the key as the starting
+	 * 	position for the search, stepNum of zero and the original key.
+	 * 	containing   
+	 * 
+	 * @param key	Key used to store value 
+	 * @param value	Value of the key
 	 */
 	public void put(String key, V value) {
 		int index = hash(key);
@@ -80,14 +88,14 @@ public class Hashtable<V> {
 		} else {
 			Pair pair = new Pair(key, value);
 		
-			//System.out.println("\nOriginal index: " + index);
+			System.out.println("\nOriginal index: " + index);
 			index = findEmpty(index, key, 0);
-			//System.out.println("Empty index: " + index);
+			System.out.println("Empty index: " + index);
 		
-			//System.out.printf("Putting %s at index: %s%n", pair, index);
+			System.out.printf("Putting %s at index: %s%n", pair, index);
 			arr[index] = pair;
 			itemCount++;
-			//System.out.println(Arrays.toString(arr));
+			System.out.println(Arrays.toString(arr));
 			
 			if (getLoadFactor() >= maxLoad) {
 				//System.out.println("\nMax load exceeded, resizing\n===========================");
@@ -108,7 +116,7 @@ public class Hashtable<V> {
 	}
 
 	/**
-	 * Return true if the Hashtable contains this key, false otherwise 
+	 * Return true if the Hashtable contains this key, otherwise false
 	 * @param key
 	 * @return
 	 */
@@ -123,9 +131,11 @@ public class Hashtable<V> {
 	 * Return all the keys in this Hashtable as a collection
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //Remove pair warning
 	public Collection<String> getKeys() {
 		ArrayList<String> keyList = new ArrayList<String>();
+		
+		//Loop through each Pair in arr and add key to keyList
 		for (int i = 0; i < arr.length; i++) {
 			Pair pair = (Pair) arr[i];
 			if (pair != null) {
@@ -140,16 +150,16 @@ public class Hashtable<V> {
 	 * @return
 	 */
 	public double getLoadFactor() {
-		//Round to 2 dp
+		//Round (itemCount / max) to 2 dp
 		return Math.round((((double) itemCount / (double) max) * 100.0)) / 100.0;
 	}
 
 	/**
-	 * return the maximum capacity of the Hashtable
+	 * Return the maximum capacity of the Hashtable
 	 * @return
 	 */
 	public int getCapacity() {
-		return (int) Math.ceil(max * maxLoad);
+		return max;
 	}
 	
 	/**
@@ -250,19 +260,45 @@ public class Hashtable<V> {
 	 * @param key
 	 * @return
 	 */
-	public int hash(String key) {
+	/*
+		private int hash(String key) {
 		key = key.toLowerCase();
 		BigInteger hugeKey = BigInteger.ZERO;
-		BigInteger big27 = BigInteger.valueOf(27);
+		BigInteger radix = BigInteger.valueOf(27);
 		int power = key.length() - 1;
 		for (int i = 0; i < key.length(); i++) {
-			int c = (int) key.charAt(i);
+			int c = (int) key.charAt(i) - 96;
 			BigInteger cBig = BigInteger.valueOf(c);
-			hugeKey = hugeKey.add(cBig.multiply(big27.pow(power))); //hugeKey += c * (27^power)
+			hugeKey = hugeKey.add(cBig.multiply(radix.pow(power))); //hugeKey += c * (27^power)
 			power -= 1;
 		}
 		
 		return hugeKey.mod(BigInteger.valueOf(max)).intValue(); //hugekey % max
+	}
+	*/
+	
+	private int hash(String key) {
+		BigInteger hugeKey = BigInteger.ZERO;
+		BigInteger radix = BigInteger.valueOf(79);
+		int power = key.length() - 1;
+		for (int i = 0; i < key.length(); i++) {
+			int c = encode(key.charAt(i)); //Convert char to int if valid character
+			BigInteger cBig = BigInteger.valueOf(c);
+			hugeKey = hugeKey.add(cBig.multiply(radix.pow(power))); //hugeKey += c * (79^power)
+			power -= 1;
+		}
+		
+		return hugeKey.mod(BigInteger.valueOf(max)).intValue(); //hugekey % max
+	}
+	
+	private int encode(char c) throws IllegalArgumentException {
+		int encode;
+		if (charPattern.matcher(String.valueOf(c)).find()) {
+			encode = (int) c;
+		} else {
+			throw new IllegalArgumentException("Invalid character in key: '" + c + "'");
+		}
+		return encode;
 	}
 
 	/**
@@ -365,8 +401,7 @@ public class Hashtable<V> {
 		
 		@Override
 		public String toString() {
-			String out = String.format("[%s, %s]", key, value);
-			return out;
+			return String.format("[%s, %s]", key, value);
 		}
 	}
 

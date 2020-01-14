@@ -19,14 +19,12 @@ public class TestHT {
 	
 	@Test
 	public void personalTesting() {
-		Hashtable<String> h = new Hashtable<String>(1000);
-		//h.put("abcdefghijklmopqvt", "123");
+		Hashtable<Integer> h = new Hashtable<Integer>(20);
+		assertEquals(h.getCapacity(), 23);//23 is smallest prime > 20
+		for(int i=0;i<20;i++) h.put(Integer.valueOf(i).toString(), Integer.valueOf(i));
+		assertFalse(h.getCapacity() == 23);//should have resized
+		assertFalse(h.getLoadFactor() > 0.6);
 		
-		//for(int i=0;i<10;i++) {
-		//	for(int j=10;j>0;j--) {
-		//		assertEquals(h.get(i+":"+j), j+":"+i);
-		//	}
-		//}
 	}
 	
 	@Test
