@@ -18,16 +18,6 @@ public class TestHT {
 	}
 	
 	@Test
-	public void personalTesting() {
-		Hashtable<Integer> h = new Hashtable<Integer>(20);
-		assertEquals(h.getCapacity(), 23);//23 is smallest prime > 20
-		for(int i=0;i<20;i++) h.put(Integer.valueOf(i).toString(), Integer.valueOf(i));
-		assertFalse(h.getCapacity() == 23);//should have resized
-		assertFalse(h.getLoadFactor() > 0.6);
-		
-	}
-	
-	@Test
 	public void testEmpty() {
 		Hashtable<Boolean> h = new Hashtable<Boolean>(100);
 		assertNull(h.get("foo"));

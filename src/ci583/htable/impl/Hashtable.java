@@ -70,11 +70,7 @@ public class Hashtable<V> {
 	 * @param initialCapacity	Initial size of the Hashtable
 	 */
 	public Hashtable(int initialCapacity) {
-		max = nextPrime(initialCapacity);
-		probeType = PROBE_TYPE.LINEAR_PROBE;	
-		arr = new Object[max];
-		
-		System.out.printf("%nArray size: %s, Probe type: %s%n", max, probeType);
+		this(initialCapacity, PROBE_TYPE.LINEAR_PROBE);
 	}
 
 	/** Store the given value against the given key.<br>
@@ -201,7 +197,6 @@ public class Hashtable<V> {
 	 * @param key		Key used for search
 	 * @return (int) Empty index where key can be stored
 	 */
-	@SuppressWarnings("unchecked") //Remove pair warning
 	private int findEmpty(int startPos, String key, int stepNum) {
 		Pair pair = (Pair) arr[startPos];		
 		if (pair == null) {
@@ -379,7 +374,7 @@ public class Hashtable<V> {
 	/**Pair object used to store keys and values
 	 */
 	private class Pair {
-		private String key; //The key used to store the Pair, to check for hash collisions
+		private String key; //The original key used to store the Pair, to check for hash collisions
 		private V value;
 
 		public Pair(String key, V value) {
